@@ -1,0 +1,8 @@
+flask
+pandas
+numpy
+faiss-cpu
+sentence-transformers
+transformers
+torch
+mysql-connector-python
