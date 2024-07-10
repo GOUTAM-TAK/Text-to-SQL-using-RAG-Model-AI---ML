@@ -27,7 +27,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         push: true
-        tags: goutamtak/ragModelImage:latest
+        tags: goutamtak/ragmodelimage:latest
         context: .
         file: ./Dockerfile
         
