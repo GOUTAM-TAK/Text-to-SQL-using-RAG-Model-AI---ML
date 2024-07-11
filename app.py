@@ -50,7 +50,7 @@ def execute_sql_query(query):
     try:
         # Connect to the MySQL database
         connection = mysql.connector.connect(
-            host='ATMECSINLT-545',  # Adjust host if necessary
+            host='localhost',  # Adjust host if necessary
             user='root',  # Replace with your MySQL username
             password='1234',  # Replace with your MySQL password
             database='task1'  # Database name
@@ -59,6 +59,7 @@ def execute_sql_query(query):
         cursor.execute(query)
         results = cursor.fetchall()
         connection.close()
+        print("successfully connected to the mysql")
         return results
     except Exception as e:
         print(f"An error occurred while executing the SQL query: {e}")
