@@ -86,6 +86,7 @@ def execute_sql_query(query):
         cursor.execute(query)
         results = cursor.fetchall()
         connection.close()
+        print("successfully connected to the mysql")
         return results
     except Exception as e:
         print(f"An error occurred while executing the SQL query: {e}")
