@@ -1,13 +1,12 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory, render_template
 import pandas as pd
 import numpy as np
 import faiss
 from sentence_transformers import SentenceTransformer
-from transformers import BartForConditionalGeneration, BartTokenizer
-import torch
 import mysql.connector
+import logging
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', template_folder='templates')
 
 # Initialize global variables
 df = None
@@ -92,23 +91,16 @@ def execute_sql_query(query):
         print(f"An error occurred while executing the SQL query: {e}")
         return None
 
-def generate_response_with_bart(results):
-    input_text = " ".join([str(row) for row in results])
-    input_ids = BartTokenizer.from_pretrained('facebook/bart-large').encode(input_text, return_tensors='pt')
-
-    # Load BART model and tokenizer
-    bart_model = BartForConditionalGeneration.from_pretrained('facebook/bart-large')
-    
-    with torch.no_grad():
-        output_ids = bart_model.generate(input_ids, max_length=512, num_beams=5, early_stopping=True)
-
-    response = BartTokenizer.from_pretrained('facebook/bart-large').decode(output_ids[0], skip_special_tokens=True)
-    return response
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 @app.route('/process_query', methods=['POST'])
 def process_query():
+    logging.info("Received request for process_query")
     user_prompt = request.json.get('prompt')
     if not user_prompt:
+        logging.error("No prompt provided")
         return jsonify({"error": "Prompt is required in the request."}), 400
     
     retrieved_query = semantic_search_top_query(user_prompt, model, index_main, df)
@@ -117,11 +109,12 @@ def process_query():
         results = execute_sql_query(retrieved_query)
         
         if results:
-            response = generate_response_with_bart(results)
-            return jsonify({"response": response})
+            return jsonify({"response": results})
         else:
+            logging.error("No results found for the executed query")
             return jsonify({"error": "No results found for the executed query."}), 404
     else:
+        logging.error("No relevant query found")
         return jsonify({"error": "No relevant query found."}), 404
 
 @app.route('/add_client_dataset', methods=['POST'])
@@ -165,4 +158,5 @@ def add_client_dataset():
             return jsonify({"error": f"An error occurred while processing the file: {e}"}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    logging.basicConfig(level=logging.INFO)
+    app.run(host='0.0.0.0', port=5000, threaded=True)

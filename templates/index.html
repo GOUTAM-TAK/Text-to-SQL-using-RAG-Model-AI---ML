@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model UI Chatbox</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="main-container">
+        <div class="chat-container">
+            <h1>Chat-Box</h1>
+            <div id="chatbox" class="chatbox"></div>
+            <form id="chatForm" method="POST" onsubmit="return false;">
+                <input type="text" id="chatInput" placeholder="Type your prompt here..." required>
+                <button type="button" onclick="sendPrompt()">Send</button>
+            </form>
+            <button id="downloadPdfBtn" onclick="downloadChatAsPDF()">Download Chat History as PDF</button>
+        </div>
+        <div class="upload-container">
+            <form id="addDatasetForm" method="POST" enctype="multipart/form-data">
+                <h2>Upload CSV</h2>
+                <label for="file">Select file:</label>
+                <input type="file" id="file" name="file" required>
+                <button type="button" onclick="addDataset()">Upload</button>
+            </form>
+            <div id="uploadResult"></div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>
+</html>
